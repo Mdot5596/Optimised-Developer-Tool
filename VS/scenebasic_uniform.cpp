@@ -29,8 +29,8 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     mouseFirstEntry(true)
 {
     //Load Models:
-    mesh = ObjMesh::load("media/soda can.obj", true);
-
+    Canmesh = ObjMesh::load("media/soda can.obj", true);
+    Wallmesh = ObjMesh::load("media/wall.obj", true);
 }
 
 
@@ -98,6 +98,11 @@ void SceneBasic_Uniform::initScene()
     glActiveTexture(GL_TEXTURE2);
     planeTex = Texture::loadTexture("media/texture/FALLOUTFLOOR.jpg");
     glBindTexture(GL_TEXTURE_2D, planeTex);
+
+    //Load Wall Texture
+    glActiveTexture(GL_TEXTURE3);
+    wallTex = Texture::loadTexture("media/texture/wall.jpg");
+    glBindTexture(GL_TEXTURE_2D, wallTex);
 
     //Mix Texture 
     glActiveTexture(GL_TEXTURE2);
@@ -176,6 +181,7 @@ void SceneBasic_Uniform::render()
     prog.setUniform("UseSecondTexture", false);
     plane.render();
 
+    //Render can
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, sodaCanTex);
     model = mat4(1.0f);
@@ -183,7 +189,19 @@ void SceneBasic_Uniform::render()
     setMatrices();
     prog.setUniform("texScale", 1.0f);
     prog.setUniform("UseSecondTexture", true);
-    mesh->render();
+    Canmesh->render();
+
+    //Render wall
+    glActiveTexture(GL_TEXTURE1);  
+    glBindTexture(GL_TEXTURE_2D, wallTex);
+    model = mat4(1.0f);
+    model = glm::translate(model, vec3(0.0f, 0.0f, -3.0f));        // Position the wall
+    model = glm::scale(model, vec3(5.0f, 2.5f, 4.0f));            // Make it wider and taller
+    setMatrices();
+    prog.setUniform("texScale", 1.0f);
+    prog.setUniform("UseSecondTexture", false);  // Assuming no moss on wall
+    Wallmesh->render();
+
 
     // Bind moss mix texture for later usage
     glActiveTexture(GL_TEXTURE2);

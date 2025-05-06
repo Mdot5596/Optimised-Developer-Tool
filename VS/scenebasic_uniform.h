@@ -19,9 +19,13 @@ private:
     //  Torus torus;
     Plane plane;
     // Teapot teapot;
-    std::unique_ptr<ObjMesh> mesh;
+    std::unique_ptr<ObjMesh> Canmesh;
+    std::unique_ptr<ObjMesh> Wallmesh;
+
     GLuint sodaCanTex;
     GLuint cubeTex;
+    GLuint wallTex;
+
     SkyBox sky;
     GLuint planeTex;
     GLuint mixTex;
