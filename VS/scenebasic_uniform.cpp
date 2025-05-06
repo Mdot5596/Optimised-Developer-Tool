@@ -31,6 +31,7 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     //Load Models:
     Canmesh = ObjMesh::load("media/soda can.obj", true);
     Wallmesh = ObjMesh::load("media/wall.obj", true);
+    Tablemesh = ObjMesh::load("media/table.obj", true);
 }
 
 
@@ -56,7 +57,7 @@ void SceneBasic_Uniform::initScene()
     float spotExponent = 0.0f;                        // Controls edge softness  SET TO 0 IF I WANT TO ACC SEE LOL
 
     cubeTex = Texture::loadHdrCubeMap("media/texture/cube/skybox-hdr/skybox");
-    prog.setUniform("SkyBoxTex", 0);  
+    prog.setUniform("SkyBoxTex", 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex);
 
@@ -103,6 +104,11 @@ void SceneBasic_Uniform::initScene()
     glActiveTexture(GL_TEXTURE3);
     wallTex = Texture::loadTexture("media/texture/wall.jpg");
     glBindTexture(GL_TEXTURE_2D, wallTex);
+
+    //Load Table Texture
+    glActiveTexture(GL_TEXTURE4);
+    GLuint tableTex = Texture::loadTexture("media/texture/Table.png");
+    glBindTexture(GL_TEXTURE_2D, tableTex);
 
     //Mix Texture 
     glActiveTexture(GL_TEXTURE2);
@@ -156,7 +162,7 @@ void SceneBasic_Uniform::render()
     prog.setUniform("Spot.Position", spotPos);
     prog.setUniform("ViewMatrix", view);
 
-  
+
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
@@ -185,23 +191,35 @@ void SceneBasic_Uniform::render()
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, sodaCanTex);
     model = mat4(1.0f);
-    model = glm::translate(model, vec3(0.0f, 0.6f, 0.0f));
+    model = glm::translate(model, vec3(0.0f, 1.75f, 2.0f));
+    model = glm::scale(model, glm::vec3(0.3f)); // Scale can down by half
     setMatrices();
     prog.setUniform("texScale", 1.0f);
     prog.setUniform("UseSecondTexture", true);
     Canmesh->render();
 
     //Render wall
-    glActiveTexture(GL_TEXTURE1);  
+    glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, wallTex);
     model = mat4(1.0f);
     model = glm::translate(model, vec3(0.0f, 0.0f, -3.0f));        // Position the wall
-    model = glm::scale(model, vec3(5.0f, 2.5f, 4.0f));            // Make it wider and taller
+    //model = glm::scale(model, vec3(5.0f, 2.5f, 4.0f));            // Make it wider and taller
+    model = glm::scale(model, glm::vec3(5.0f));
     setMatrices();
     prog.setUniform("texScale", 1.0f);
     prog.setUniform("UseSecondTexture", false);  // Assuming no moss on wall
     Wallmesh->render();
 
+    // Render Table
+    glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, tableTex);
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.0f, 0.0f, 2.0f));  // Adjust position as needed
+    model = glm::scale(model, glm::vec3(3.5f));                  // Scale if needed
+    setMatrices();
+    prog.setUniform("texScale", 1.0f);
+    prog.setUniform("UseSecondTexture", false);
+    Tablemesh->render();
 
     // Bind moss mix texture for later usage
     glActiveTexture(GL_TEXTURE2);

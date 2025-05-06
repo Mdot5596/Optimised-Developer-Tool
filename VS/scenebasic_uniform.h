@@ -21,10 +21,14 @@ private:
     // Teapot teapot;
     std::unique_ptr<ObjMesh> Canmesh;
     std::unique_ptr<ObjMesh> Wallmesh;
+    std::unique_ptr<ObjMesh> Tablemesh;
+
 
     GLuint sodaCanTex;
     GLuint cubeTex;
     GLuint wallTex;
+    GLuint tableTex;
+
 
     SkyBox sky;
     GLuint planeTex;
