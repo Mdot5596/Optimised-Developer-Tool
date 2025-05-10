@@ -1,0 +1,44 @@
+#version 430 core
+// fire.tcs
+#version 460 core
+
+layout(vertices = 1) out;
+
+in vec3 Position[];
+in vec3 VelocityOut[];
+in float AgeOut[];
+
+out vec3 TCPosition[];
+out vec3 TCVelocity[];
+out float TCAge[];
+
+void main() {
+    TCPosition[gl_InvocationID] = Position[gl_InvocationID];
+    TCVelocity[gl_InvocationID] = VelocityOut[gl_InvocationID];
+    TCAge[gl_InvocationID] = AgeOut[gl_InvocationID];
+
+    gl_TessLevelOuter[0] = 1.0;
+    gl_TessLevelOuter[1] = 1.0;
+}
+
+
+// fire.tes
+#version 460 core
+
+layout(isolines, equal_spacing, ccw) in;
+
+in vec3 TCPosition[];
+in vec3 TCVelocity[];
+in float TCAge[];
+
+out vec3 TEPosition;
+out float Age;
+out vec3 Velocity;
+
+void main() {
+    TEPosition = TCPosition[0];
+    Velocity = TCVelocity[0];
+    Age = TCAge[0];
+
+    gl_Position = vec4(TEPosition, 1.0);
+}

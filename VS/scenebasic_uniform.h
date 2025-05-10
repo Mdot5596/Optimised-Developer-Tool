@@ -12,6 +12,7 @@
 #include "helper/objmesh.h"
 #include "helper/cube.h"
 #include "helper/skybox.h"
+#include "helper/random.h"
 
 class SceneBasic_Uniform : public Scene
 {
@@ -49,6 +50,16 @@ private:
     float cameraLastXPos;
     float cameraLastYPos;
 
+    // Particle system fields
+    float time, deltaT, particleLifetime;
+    int nParticles;
+    GLuint posBuf[2], velBuf[2], age[2];
+    GLuint particleArray[2];
+    GLuint feedback[2];
+    GLuint drawBuf;
+    glm::vec3 emitterPos, emitterDir;
+    Random rand;
+    GLSLProgram fireProg;
 
 public:
     SceneBasic_Uniform();
@@ -57,6 +68,9 @@ public:
     void update(float t);
     void render();
     void resize(int, int);
+    void initBuffers();                  // Fire particle buffers
+    void setMatrices(GLSLProgram& prog); // Overload for fire shader
+
 
     //Movement 
     void handleKeyboardInput(float deltaTime);

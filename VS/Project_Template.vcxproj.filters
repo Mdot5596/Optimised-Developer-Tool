@@ -104,6 +104,15 @@
     <None Include="shader\solid.vert">
       <Filter>shaders</Filter>
     </None>
+    <None Include="shader\fire.gs">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shader\fire.tes">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shader\fire.tcs">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="helper\stb\stb_image.h">

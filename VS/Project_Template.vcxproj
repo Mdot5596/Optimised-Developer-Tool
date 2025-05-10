@@ -167,6 +167,9 @@
     <None Include="shader\basic_uniform.frag" />
     <None Include="shader\basic_uniform.vert" />
     <None Include="shader\fire.frag" />
+    <None Include="shader\fire.gs" />
+    <None Include="shader\fire.tcs" />
+    <None Include="shader\fire.tes" />
     <None Include="shader\fire.vert" />
     <None Include="shader\skybox.frag" />
     <None Include="shader\skybox.vert" />
