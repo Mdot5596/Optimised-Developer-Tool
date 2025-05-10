@@ -38,7 +38,7 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
 void SceneBasic_Uniform::initScene()
 {
     compile();
-    glEnable(GL_DEPTH_TEST); // Enable depth testing
+    glEnable(GL_DEPTH_TEST); 
 
     //Lock mouse to screen
     GLFWwindow* Falloutscene = glfwGetCurrentContext();
@@ -50,24 +50,7 @@ void SceneBasic_Uniform::initScene()
     projection = mat4(1.0f);
     angle = 0.0f;
 
-    //Spotlight Setup
-    vec3 spotPos = vec3(2.0f, 5.0f, 3.0f);              // Position of spotlight in world space
-    vec3 spotDir = normalize(vec3(-0.5f, -1.0f, 0.0f)); // Direction the spotlight points
-    float spotCutoff = glm::cos(glm::radians(25.0f));   // Convert cutoff angle (25) to cosine
-    float spotExponent = 0.0f;                        // Controls edge softness  SET TO 0 IF I WANT TO ACC SEE LOL
-
-    cubeTex = Texture::loadHdrCubeMap("media/texture/cube/skybox-hdr/skybox");
-    prog.setUniform("SkyBoxTex", 0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex);
-
-    // Set spotlight uniforms
-    prog.setUniform("Spot.Position", spotPos);  // world space
-    prog.setUniform("Spot.Direction", spotDir); // world space
-    prog.setUniform("Spot.L", vec3(1.0f, 1.0f, 1.0f));  // Light intensity
-    prog.setUniform("Spot.La", vec3(0.2f, 0.2f, 0.2f)); // Ambient light
-    prog.setUniform("Spot.Exponent", spotExponent);
-    prog.setUniform("Spot.Cutoff", spotCutoff);
+  
 
     //Material Properties
     prog.setUniform("Material.Ka", vec3(0.2f, 0.2f, 0.2f));
@@ -75,14 +58,11 @@ void SceneBasic_Uniform::initScene()
     prog.setUniform("Material.Ks", vec3(1.0f, 1.0f, 1.0f));
     prog.setUniform("Material.Shininess", 50.0f);
 
-    //Fog Properties
-    prog.setUniform("Fog.MinDist", 5.0f); //5 and 25
-    prog.setUniform("Fog.MaxDist", 25.0f);
-    prog.setUniform("Fog.Color", vec3(0.5f, 0.5f, 0.5f));
+
 
     //Texture Scaling
     prog.setUniform("texScale", 1.0f);
-    prog.setUniform("mixFactor", 0.5f);  // Adjust this value to control blending
+    prog.setUniform("mixFactor", 0.5f);  
 
     //Load Textures
     glActiveTexture(GL_TEXTURE1);
@@ -157,9 +137,6 @@ void SceneBasic_Uniform::render()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color & depth buffers
 
-    // Update spotlight uniforms
-    vec3 spotPos = vec3(10.0f * cos(angle), 10.0f, 10.0f * sin(angle));
-    prog.setUniform("Spot.Position", spotPos);
     prog.setUniform("ViewMatrix", view);
 
 
@@ -173,7 +150,7 @@ void SceneBasic_Uniform::render()
     model = mat4(1.0f);
     setMatrices();
     prog.setUniform("IsSkybox", true);
-    sky.render();  // Draw the skybox
+    sky.render();  
 
     // Reset to normal shading for other objects
     prog.setUniform("IsSkybox", false);
@@ -202,20 +179,20 @@ void SceneBasic_Uniform::render()
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, wallTex);
     model = mat4(1.0f);
-    model = glm::translate(model, vec3(0.0f, 0.0f, -3.0f));        // Position the wall
+    model = glm::translate(model, vec3(0.0f, 0.0f, -3.0f));         // Position the wall
     //model = glm::scale(model, vec3(5.0f, 2.5f, 4.0f));            // Make it wider and taller
     model = glm::scale(model, glm::vec3(5.0f));
     setMatrices();
     prog.setUniform("texScale", 1.0f);
-    prog.setUniform("UseSecondTexture", false);  // Assuming no moss on wall
+    prog.setUniform("UseSecondTexture", false);  
     Wallmesh->render();
 
     // Render Table
     glActiveTexture(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, tableTex);
     model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, 0.0f, 2.0f));  // Adjust position as needed
-    model = glm::scale(model, glm::vec3(3.5f));                  // Scale if needed
+    model = glm::translate(model, glm::vec3(0.0f, 0.0f, 2.0f));  
+    model = glm::scale(model, glm::vec3(3.5f));                  
     setMatrices();
     prog.setUniform("texScale", 1.0f);
     prog.setUniform("UseSecondTexture", false);
@@ -239,15 +216,9 @@ void SceneBasic_Uniform::resize(int w, int h)
 
 void SceneBasic_Uniform::setMatrices()
 {
-    mat4 mv = view * model; // Compute the Model-View matrix
-
-    // Send Model-View matrix to the shader
+    mat4 mv = view * model;
     prog.setUniform("ModelViewMatrix", mv);
-
-    // Compute and send Normal Matrix (used for transforming normals correctly)
     prog.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
-
-    // Send Model-View-Projection matrix to the shader
     prog.setUniform("MVP", projection * mv);
 }
 

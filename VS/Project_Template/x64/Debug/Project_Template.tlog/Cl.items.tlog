@@ -2,11 +2,14 @@ D:\Uni\3015\Optimised-Developer-Tool\VS\glad.c;D:\Uni\3015\Optimised-Developer-T
 D:\Uni\3015\Optimised-Developer-Tool\VS\helper\cube.cpp;D:\Uni\3015\Optimised-Developer-Tool\VS\Project_Template\x64\Debug\cube.obj
 D:\Uni\3015\Optimised-Developer-Tool\VS\helper\glslprogram.cpp;D:\Uni\3015\Optimised-Developer-Tool\VS\Project_Template\x64\Debug\glslprogram.obj
 D:\Uni\3015\Optimised-Developer-Tool\VS\helper\glutils.cpp;D:\Uni\3015\Optimised-Developer-Tool\VS\Project_Template\x64\Debug\glutils.obj
+D:\Uni\3015\Optimised-Developer-Tool\VS\helper\grid.cpp;D:\Uni\3015\Optimised-Developer-Tool\VS\Project_Template\x64\Debug\grid.obj
 D:\Uni\3015\Optimised-Developer-Tool\VS\helper\objmesh.cpp;D:\Uni\3015\Optimised-Developer-Tool\VS\Project_Template\x64\Debug\objmesh.obj
 D:\Uni\3015\Optimised-Developer-Tool\VS\helper\plane.cpp;D:\Uni\3015\Optimised-Developer-Tool\VS\Project_Template\x64\Debug\plane.obj
 D:\Uni\3015\Optimised-Developer-Tool\VS\helper\skybox.cpp;D:\Uni\3015\Optimised-Developer-Tool\VS\Project_Template\x64\Debug\skybox.obj
+D:\Uni\3015\Optimised-Developer-Tool\VS\helper\sphere.cpp;D:\Uni\3015\Optimised-Developer-Tool\VS\Project_Template\x64\Debug\sphere.obj
 D:\Uni\3015\Optimised-Developer-Tool\VS\helper\stb_image.cpp;D:\Uni\3015\Optimised-Developer-Tool\VS\Project_Template\x64\Debug\stb_image.obj
 D:\Uni\3015\Optimised-Developer-Tool\VS\helper\teapot.cpp;D:\Uni\3015\Optimised-Developer-Tool\VS\Project_Template\x64\Debug\teapot.obj
+D:\Uni\3015\Optimised-Developer-Tool\VS\helper\teapotpatch.cpp;D:\Uni\3015\Optimised-Developer-Tool\VS\Project_Template\x64\Debug\teapotpatch.obj
 D:\Uni\3015\Optimised-Developer-Tool\VS\helper\texture.cpp;D:\Uni\3015\Optimised-Developer-Tool\VS\Project_Template\x64\Debug\texture.obj
 D:\Uni\3015\Optimised-Developer-Tool\VS\helper\torus.cpp;D:\Uni\3015\Optimised-Developer-Tool\VS\Project_Template\x64\Debug\torus.obj
 D:\Uni\3015\Optimised-Developer-Tool\VS\helper\trianglemesh.cpp;D:\Uni\3015\Optimised-Developer-Tool\VS\Project_Template\x64\Debug\trianglemesh.obj

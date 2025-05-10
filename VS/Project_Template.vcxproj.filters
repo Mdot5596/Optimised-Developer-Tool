@@ -69,6 +69,15 @@
     <ClCompile Include="helper\stb_image.cpp">
       <Filter>helper\stb</Filter>
     </ClCompile>
+    <ClCompile Include="helper\grid.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="helper\teapotpatch.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="helper\sphere.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\basic_uniform.frag">
@@ -81,6 +90,18 @@
       <Filter>shaders</Filter>
     </None>
     <None Include="shader\skybox.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shader\fire.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shader\fire.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shader\solid.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shader\solid.vert">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>
@@ -140,6 +161,21 @@
       <Filter>helper</Filter>
     </ClInclude>
     <ClInclude Include="helper\texture.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\grid.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\particleutils.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\random.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\teapotpatch.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\sphere.h">
       <Filter>helper</Filter>
     </ClInclude>
   </ItemGroup>
