@@ -2,7 +2,7 @@
 
 const float PI = 3.14159265359;
 
-layout(location = 0) in vec3 VertexPosition;
+layout(location = 0) in vec3 VertexPosition; 
 layout(location = 1) in vec3 VertexVelocity;
 layout(location = 2) in float VertexAge;
 
@@ -29,7 +29,7 @@ uniform vec3 Emitter = vec3(0);
 uniform mat3 EmitterBasis;
 
 const vec3 offsets[] = vec3[](
-    vec3(-0.5, -0.5, 0),
+    vec3(-0.5, -0.5, 0), 
     vec3( 0.5, -0.5, 0),
     vec3( 0.5,  0.5, 0),
     vec3(-0.5, -0.5, 0),
@@ -38,27 +38,37 @@ const vec3 offsets[] = vec3[](
 );
 
 const vec2 texCoords[] = vec2[](
-    vec2(0,0), vec2(1,0), vec2(1,1),
-    vec2(0,0), vec2(1,1), vec2(0,1)
+    vec2(0, 0),
+    vec2(1, 0),
+    vec2(1, 1),
+    vec2(0, 0),
+    vec2(1, 1),
+    vec2(0, 1)
 );
 
 vec3 randomInitialVelocity()
 {
     float theta = mix(0.0, PI / 8.0, texelFetch(RandomTex, 3 * gl_VertexID, 0).r);
-    float phi   = mix(0.0, 2.0 * PI, texelFetch(RandomTex, 3 * gl_VertexID + 1, 0).r);
-    float speed = mix(1.25, 1.5, texelFetch(RandomTex, 3 * gl_VertexID + 2, 0).r);
+    float phi = mix(0.0, 2.0 * PI, texelFetch(RandomTex, 3 * gl_VertexID + 1, 0).r);
+    float velocity = mix(1.25, 1.5, texelFetch(RandomTex, 3 * gl_VertexID + 2, 0).r);
 
-    vec3 dir = vec3(sin(theta) * cos(phi), cos(theta), sin(theta) * sin(phi));
-    return normalize(EmitterBasis * dir) * speed;
+    vec3 v = vec3(sin(theta) * cos(phi), cos(theta), sin(theta) * sin(phi));
+    return normalize(EmitterBasis * v) * velocity;
 }
 
 void update()
 {
-    if (VertexAge < 0.0 || VertexAge > ParticleLifetime) {
+    if (VertexAge < 0 || VertexAge > ParticleLifetime)
+    {
         Position = Emitter;
         Velocity = randomInitialVelocity();
-        Age = (VertexAge < 0.0) ? VertexAge + DeltaT : (VertexAge - ParticleLifetime) + DeltaT;
-    } else {
+        if (VertexAge < 0)
+            Age = VertexAge + DeltaT;
+        else
+            Age = (VertexAge - ParticleLifetime) + DeltaT;
+    }
+    else
+    {
         Position = VertexPosition + VertexVelocity * DeltaT;
         Velocity = VertexVelocity + Accel * DeltaT;
         Age = VertexAge + DeltaT;
@@ -67,20 +77,25 @@ void update()
 
 void render()
 {
-    Transp = 0.0;
-    vec3 posCam = vec3(0.0);
-
-    if (VertexAge > 0.0) {
-        posCam = (ModelViewMatrix * vec4(VertexPosition, 1)).xyz + offsets[gl_VertexID % 6] * ParticleSize;
-        Transp = clamp(1.0 - VertexAge / ParticleLifetime, 0.0, 1.0);
+    if (VertexAge <= 0.0) {
+        gl_Position = vec4(0.0);
+        return;
     }
 
-    TexCoord = texCoords[gl_VertexID % 6];
-    gl_Position = ProjectionMatrix * vec4(posCam, 1.0);
+    vec4 worldPos = vec4(VertexPosition, 1.0);
+    vec4 offsetWorld = vec4(offsets[gl_VertexID] * ParticleSize, 0.0);
+
+    vec4 finalPos = worldPos + offsetWorld;
+    gl_Position = ProjectionMatrix * ModelViewMatrix * finalPos;
+
+    TexCoord = texCoords[gl_VertexID];
+    Transp = clamp(1.0 - VertexAge / ParticleLifetime, 0.0, 1.0);
 }
 
-void main()
+void main() 
 {
-    if (Pass == 1) update();
-    else render();
+    if (Pass == 1)
+        update();
+    else
+        render();
 }

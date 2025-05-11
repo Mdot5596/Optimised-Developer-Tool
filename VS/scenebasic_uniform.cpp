@@ -27,9 +27,9 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     cameraYaw(-90.0f),
     cameraPitch(0.0f),
     mouseFirstEntry(true),
-    particleLifetime(6.5f),
-    nParticles(4000),
-    emitterPos(1, 0, 0), emitterDir(-1, 2, 0),
+    particleLifetime(5.0f),
+    nParticles(3000),
+    emitterPos(2, 4, 2), emitterDir(0, 1, 0),
     rotSpeed(0.1f)
 {
     //Load Models:
@@ -108,7 +108,7 @@ void SceneBasic_Uniform::initScene()
     model = mat4(1.0f);
 
     glActiveTexture(GL_TEXTURE0);
-    particleTex = Texture::loadTexture("media/texture/bluewater.png");
+    particleTex = Texture::loadTexture("media/texture/green.png");
     if (particleTex == 0) std::cerr << "Failed to load particle texture!" << std::endl;
     glBindTexture(GL_TEXTURE_2D, particleTex);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -123,7 +123,7 @@ void SceneBasic_Uniform::initScene()
     particlefnt.setUniform("RandomTex", 1);
     particlefnt.setUniform("ParticleTex", 0);
     particlefnt.setUniform("ParticleLifetime", particleLifetime);
-    particlefnt.setUniform("ParticleSize", 1.05f);
+    particlefnt.setUniform("ParticleSize", 0.05f);
     particlefnt.setUniform("Accel", vec3(0.0f, -0.5f, 0.0f));
     particlefnt.setUniform("EmitterPos", emitterPos);
     particlefnt.setUniform("EmitterBasis", ParticleUtils::makeArbitraryBasis(emitterDir));
@@ -213,7 +213,7 @@ void SceneBasic_Uniform::render()
     glBindTexture(GL_TEXTURE_2D, planeTex);
     model = mat4(1.0f);
     model = translate(model, vec3(0.0f, -1.0f, 0.0f));
-    setMatrices(skyProg);
+    setMatrices(prog);
     prog.setUniform("texScale", 5.0f);
     prog.setUniform("UseSecondTexture", false);
     plane.render();
@@ -276,10 +276,8 @@ void SceneBasic_Uniform::render()
     glDisable(GL_RASTERIZER_DISCARD);
 
     particlefnt.setUniform("Pass", 2);
-    vec3 cameraPos(3.0f * cos(angle), 1.5f, 3.0f * sin(angle));
-    view = glm::lookAt(cameraPos, vec3(0.0f, 1.5f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
    
-   setMatrices(particlefnt);
+    setMatrices(particlefnt);
 
     glDepthMask(GL_FALSE);
 
