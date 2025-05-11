@@ -92,25 +92,10 @@
     <None Include="shader\skybox.vert">
       <Filter>shaders</Filter>
     </None>
-    <None Include="shader\fire.frag">
+    <None Include="shader\particles.frag">
       <Filter>shaders</Filter>
     </None>
-    <None Include="shader\fire.vert">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="shader\solid.frag">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="shader\solid.vert">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="shader\fire.gs">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="shader\fire.tes">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="shader\fire.tcs">
+    <None Include="shader\particles.vert">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>

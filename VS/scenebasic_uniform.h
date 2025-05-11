@@ -13,6 +13,8 @@
 #include "helper/cube.h"
 #include "helper/skybox.h"
 #include "helper/random.h"
+#include "helper/particleutils.h"
+
 
 class SceneBasic_Uniform : public Scene
 {
@@ -29,15 +31,15 @@ private:
     GLuint cubeTex;
     GLuint wallTex;
     GLuint tableTex;
-
+    
 
     SkyBox sky;
     GLuint planeTex;
     GLuint mixTex;
     float tPrev;
     float angle;
-    GLSLProgram prog, skyProg;
-    void setMatrices();
+    GLSLProgram prog, skyProg, particlefnt;
+    void setMatrices(GLSLProgram& p);
     void compile();
 
     // Camera and mouse variables
@@ -49,8 +51,21 @@ private:
     bool mouseFirstEntry;
     float cameraLastXPos;
     float cameraLastYPos;
-
- 
+    //prtcl
+    float particleLifetime;
+    int nParticles;
+    void initBuffers();
+    float time, deltaT;
+    float rotSpeed;
+    GLuint particleTex;
+    glm::vec3 emitterPos, emitterDir;
+    //Particle buffer
+    GLuint posBuf[2], velBuf[2], age[2];
+    //VAO
+    GLuint particleArray[2];
+    //Transform feedback
+    GLuint feedback[2];
+    GLuint drawBuf;
 
 public:
     SceneBasic_Uniform();

@@ -166,15 +166,10 @@
   <ItemGroup>
     <None Include="shader\basic_uniform.frag" />
     <None Include="shader\basic_uniform.vert" />
-    <None Include="shader\fire.frag" />
-    <None Include="shader\fire.gs" />
-    <None Include="shader\fire.tcs" />
-    <None Include="shader\fire.tes" />
-    <None Include="shader\fire.vert" />
+    <None Include="shader\particles.frag" />
+    <None Include="shader\particles.vert" />
     <None Include="shader\skybox.frag" />
     <None Include="shader\skybox.vert" />
-    <None Include="shader\solid.frag" />
-    <None Include="shader\solid.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="helper\aabb.h" />
