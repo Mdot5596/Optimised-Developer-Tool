@@ -166,6 +166,8 @@
   <ItemGroup>
     <None Include="shader\basic_uniform.frag" />
     <None Include="shader\basic_uniform.vert" />
+    <None Include="shader\blur.frag" />
+    <None Include="shader\blur.vert" />
     <None Include="shader\particles.frag" />
     <None Include="shader\particles.vert" />
     <None Include="shader\skybox.frag" />

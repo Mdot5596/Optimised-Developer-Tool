@@ -100,7 +100,7 @@ void SceneBasic_Uniform::initScene()
     glBindTexture(GL_TEXTURE_2D, mixTex);
 
 
-    //prtcl
+    //Particle Fnt
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -128,6 +128,10 @@ void SceneBasic_Uniform::initScene()
     particlefnt.setUniform("EmitterPos", emitterPos);
     particlefnt.setUniform("EmitterBasis", ParticleUtils::makeArbitraryBasis(emitterDir));
 
+
+    //Gassian Blur
+
+
 }
 
 
@@ -141,11 +145,14 @@ void SceneBasic_Uniform::compile()
         skyProg.compileShader("shader/skybox.frag");
         particlefnt.compileShader("shader/particles.vert");
         particlefnt.compileShader("shader/particles.frag");
+        gassblr.compileShader("shader/blur.vert");
+        gassblr.compileShader("shader/blur.frag");
 
         GLuint  particlefntHandle = particlefnt.getHandle();
         const char* outputNames[] = { "Position", "Velocity", "Age" };
         glTransformFeedbackVaryings(particlefntHandle, 3, outputNames, GL_SEPARATE_ATTRIBS);
 
+        gassblr.link();
         particlefnt.link();
         skyProg.link();
         prog.link();
@@ -206,7 +213,6 @@ void SceneBasic_Uniform::render()
     prog.setUniform("IsSkybox", true);
     sky.render();
 
-    // Reset to normal shading for other objects
     prog.setUniform("IsSkybox", false);
 
     glActiveTexture(GL_TEXTURE1);
@@ -223,7 +229,7 @@ void SceneBasic_Uniform::render()
     glBindTexture(GL_TEXTURE_2D, sodaCanTex);
     model = mat4(1.0f);
     model = glm::translate(model, vec3(0.0f, 1.75f, 2.0f));
-    model = glm::scale(model, glm::vec3(0.3f)); // Scale can down by half
+    model = glm::scale(model, glm::vec3(0.3f)); 
     setMatrices(prog);
     prog.setUniform("texScale", 1.0f);
     prog.setUniform("UseSecondTexture", true);
@@ -233,8 +239,8 @@ void SceneBasic_Uniform::render()
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, wallTex);
     model = mat4(1.0f);
-    model = glm::translate(model, vec3(0.0f, 0.0f, -3.0f));         // Position the wall
-    //model = glm::scale(model, vec3(5.0f, 2.5f, 4.0f));            // Make it wider and taller
+    model = glm::translate(model, vec3(0.0f, 0.0f, -3.0f));         
+    //model = glm::scale(model, vec3(5.0f, 2.5f, 4.0f));            
     model = glm::scale(model, glm::vec3(5.0f));
     setMatrices(prog);
     prog.setUniform("texScale", 1.0f);
@@ -257,7 +263,7 @@ void SceneBasic_Uniform::render()
     glBindTexture(GL_TEXTURE_2D, mixTex);
 
 
-    //prtcl
+    //Particle Fnt
     particlefnt.use();
     particlefnt.setUniform("Time", time);
     particlefnt.setUniform("DeltaT", deltaT);
@@ -276,7 +282,7 @@ void SceneBasic_Uniform::render()
     glDisable(GL_RASTERIZER_DISCARD);
 
     particlefnt.setUniform("Pass", 2);
-   
+
     setMatrices(particlefnt);
 
     glDepthMask(GL_FALSE);
@@ -316,6 +322,8 @@ void SceneBasic_Uniform::setMatrices(GLSLProgram& p)
 
 void SceneBasic_Uniform::initBuffers()
 {
+
+    //Particle Fnt
     glGenBuffers(2, posBuf);
     glGenBuffers(2, velBuf);
     glGenBuffers(2, age);
@@ -461,4 +469,68 @@ void SceneBasic_Uniform::handleMouseInput()
     direction.y = sin(glm::radians(cameraPitch));
     direction.z = sin(glm::radians(cameraYaw)) * cos(glm::radians(cameraPitch));
     cameraFront = glm::normalize(direction);
+}
+
+//--------Gauss Blur Attempt Bellow-----------------
+
+
+void SceneBasic_Uniform::setupFBO()
+{
+    glGenFramebuffers(1, &renderFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, renderFBO);
+
+    glGenTextures(1, &renderTex);
+    glBindTexture(GL_TEXTURE_2D, renderTex);
+
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderTex, 0);
+
+    GLuint depthBuf;
+    glGenRenderbuffers(1, &depthBuf);
+    glBindRenderbuffer(GL_RENDERBUFFER, depthBuf);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuf);
+
+    GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0 };
+    glDrawBuffers(1, drawBuffers);
+    GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (result == GL_FRAMEBUFFER_COMPLETE)
+    {
+        std::cout << "Framebuffer is complete" << endl;
+    }
+    else
+    {
+        std::cout << "Framebuffer error" << endl;
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glGenFramebuffers(1, &intermediateFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
+
+    glGenTextures(1, &intermediateTex);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, intermediateTex);
+
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, intermediateTex, 0);
+
+    glDrawBuffers(1, drawBuffers);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+float SceneBasic_Uniform::gauss(float x, float sigma2)
+{
+    double coeff = 1.0 / (glm::two_pi<double>() * sigma2);
+    double exponent = -(x * x) / (2.0 * sigma2);
+    return (float)(coeff * exp(exponent));
 }

@@ -19,9 +19,7 @@
 class SceneBasic_Uniform : public Scene
 {
 private:
-    //  Torus torus;
     Plane plane;
-    // Teapot teapot;
     std::unique_ptr<ObjMesh> Canmesh;
     std::unique_ptr<ObjMesh> Wallmesh;
     std::unique_ptr<ObjMesh> Tablemesh;
@@ -31,14 +29,14 @@ private:
     GLuint cubeTex;
     GLuint wallTex;
     GLuint tableTex;
-    
+
 
     SkyBox sky;
     GLuint planeTex;
     GLuint mixTex;
     float tPrev;
     float angle;
-    GLSLProgram prog, skyProg, particlefnt;
+    GLSLProgram prog, skyProg, particlefnt, gassblr;
     void setMatrices(GLSLProgram& p);
     void compile();
 
@@ -51,7 +49,9 @@ private:
     bool mouseFirstEntry;
     float cameraLastXPos;
     float cameraLastYPos;
-    //prtcl
+
+
+    //Particle Fnt
     float particleLifetime;
     int nParticles;
     void initBuffers();
@@ -59,13 +59,13 @@ private:
     float rotSpeed;
     GLuint particleTex;
     glm::vec3 emitterPos, emitterDir;
-    //Particle buffer
     GLuint posBuf[2], velBuf[2], age[2];
-    //VAO
     GLuint particleArray[2];
-    //Transform feedback
     GLuint feedback[2];
     GLuint drawBuf;
+
+    //Gassian Blur
+
 
 public:
     SceneBasic_Uniform();
