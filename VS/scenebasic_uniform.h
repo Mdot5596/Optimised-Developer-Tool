@@ -37,6 +37,7 @@ private:
     float tPrev;
     float angle;
     GLSLProgram prog, skyProg, particlefnt, gassblr;
+    GLuint fsQuad, renderTex, intermediateTex, renderFBO, intermediateFBO;
     void setMatrices(GLSLProgram& p);
     void compile();
 
@@ -65,6 +66,13 @@ private:
     GLuint drawBuf;
 
     //Gassian Blur
+    void setupFBO();
+    void pass1();
+    void pass2();
+    void pass3();
+    float gauss(float, float);
+
+
 
 
 public:

@@ -3,7 +3,6 @@
 layout(location = 0) in vec3 VertexPosition; // Position of the vertex
 layout(location = 1) in vec3 VertexNormal;   // Normal vector of the vertex
 
-
 out vec3 Position;
 out vec3 Normal;
 

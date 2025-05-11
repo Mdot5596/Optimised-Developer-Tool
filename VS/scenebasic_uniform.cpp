@@ -129,9 +129,59 @@ void SceneBasic_Uniform::initScene()
     particlefnt.setUniform("EmitterBasis", ParticleUtils::makeArbitraryBasis(emitterDir));
 
 
+    setupFBO();
+
     //Gassian Blur
 
+    GLfloat verts[] =
+    {
+        -1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+        -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 1.0f, 0.0f
+    };
 
+    GLfloat tc[] =
+    {
+        0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+        0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f
+    };
+
+    unsigned int handle[2];
+    glGenBuffers(2, handle);
+    glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
+    glBufferData(GL_ARRAY_BUFFER, 6 * 3 * sizeof(float), verts, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
+    glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), tc, GL_STATIC_DRAW);
+
+    glGenVertexArrays(1, &fsQuad);
+    glBindVertexArray(fsQuad);
+
+    glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
+    glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
+    glVertexAttribPointer((GLuint)2, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(2);
+
+    glBindVertexArray(0);
+
+    float weights[5], sum, sigma2 = 8.0f;
+
+    weights[0] = gauss(0, sigma2);
+    sum = weights[0];
+    for (int i = 1; i < 5; i++)
+    {
+        weights[i] = gauss((float)i, sigma2);
+        sum += 2 * weights[i];
+    }
+
+    gassblr.use();
+    for (int i = 0; i < 5; i++)
+    {
+        std::stringstream uniName;
+        uniName << "Weight[" << i << "]";
+        float val = weights[i] / sum;
+        gassblr.setUniform(uniName.str().c_str(), val);
+    }
 }
 
 
@@ -196,6 +246,23 @@ void SceneBasic_Uniform::update(float t)
 
 void SceneBasic_Uniform::render()
 {
+    pass1();
+    pass2();
+    pass3();
+
+}
+
+void SceneBasic_Uniform::pass1()
+{
+    //view = glm::lookAt(vec3(7.0f * cos(angle), 4.0f, 7.0f * sin(angle)), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+    projection = glm::perspective(glm::radians(60.0f), (float)width / height, 0.3f, 100.0f);
+
+    prog.use();
+    prog.setUniform("Pass", 1);
+    glBindFramebuffer(GL_FRAMEBUFFER, renderFBO);
+    glEnable(GL_DEPTH_TEST);
+
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color & depth buffers
 
     prog.setUniform("ViewMatrix", view);
@@ -229,7 +296,7 @@ void SceneBasic_Uniform::render()
     glBindTexture(GL_TEXTURE_2D, sodaCanTex);
     model = mat4(1.0f);
     model = glm::translate(model, vec3(0.0f, 1.75f, 2.0f));
-    model = glm::scale(model, glm::vec3(0.3f)); 
+    model = glm::scale(model, glm::vec3(0.3f));
     setMatrices(prog);
     prog.setUniform("texScale", 1.0f);
     prog.setUniform("UseSecondTexture", true);
@@ -239,7 +306,7 @@ void SceneBasic_Uniform::render()
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, wallTex);
     model = mat4(1.0f);
-    model = glm::translate(model, vec3(0.0f, 0.0f, -3.0f));         
+    model = glm::translate(model, vec3(0.0f, 0.0f, -3.0f));
     //model = glm::scale(model, vec3(5.0f, 2.5f, 4.0f));            
     model = glm::scale(model, glm::vec3(5.0f));
     setMatrices(prog);
@@ -261,7 +328,6 @@ void SceneBasic_Uniform::render()
     // Bind moss mix texture for later usage
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, mixTex);
-
 
     //Particle Fnt
     particlefnt.use();
@@ -297,7 +363,53 @@ void SceneBasic_Uniform::render()
     drawBuf = 1 - drawBuf;
 
 
+
 }
+
+void SceneBasic_Uniform::pass2()
+{
+    gassblr.use();
+    gassblr.setUniform("Pass", 2);
+    glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, renderTex);
+
+    glDisable(GL_DEPTH_TEST);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    model = mat4(1.0f);
+    view = mat4(1.0f);
+    projection = mat4(1.0f);
+
+    setMatrices(gassblr);
+
+    glBindVertexArray(fsQuad);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+}
+
+
+void SceneBasic_Uniform::pass3()
+{
+    gassblr.use();
+    gassblr.setUniform("Pass", 3);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, intermediateTex);
+
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    model = mat4(1.0f);
+    view = mat4(1.0f);
+    projection = mat4(1.0f);
+
+    setMatrices(gassblr);
+
+    glBindVertexArray(fsQuad);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+}
+
 
 
 void SceneBasic_Uniform::resize(int w, int h)
@@ -319,11 +431,11 @@ void SceneBasic_Uniform::setMatrices(GLSLProgram& p)
     p.setUniform("ProjectionMatrix", projection);
 }
 
+//--------Particae Fountine Bellow------------------------------------------------
 
 void SceneBasic_Uniform::initBuffers()
 {
 
-    //Particle Fnt
     glGenBuffers(2, posBuf);
     glGenBuffers(2, velBuf);
     glGenBuffers(2, age);
@@ -399,6 +511,7 @@ void SceneBasic_Uniform::initBuffers()
     glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 2, age[1]);
     glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
 }
+//---------------------------------------------------------------------------------------
 
 
 
@@ -471,7 +584,8 @@ void SceneBasic_Uniform::handleMouseInput()
     cameraFront = glm::normalize(direction);
 }
 
-//--------Gauss Blur Attempt Bellow-----------------
+
+//--------Gauss Blur Bellow------------------------------------------------------
 
 
 void SceneBasic_Uniform::setupFBO()
@@ -480,6 +594,7 @@ void SceneBasic_Uniform::setupFBO()
     glBindFramebuffer(GL_FRAMEBUFFER, renderFBO);
 
     glGenTextures(1, &renderTex);
+    glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D, renderTex);
 
     glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
@@ -513,7 +628,7 @@ void SceneBasic_Uniform::setupFBO()
     glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
 
     glGenTextures(1, &intermediateTex);
-    glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D, intermediateTex);
 
     glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
@@ -534,3 +649,6 @@ float SceneBasic_Uniform::gauss(float x, float sigma2)
     double exponent = -(x * x) / (2.0 * sigma2);
     return (float)(coeff * exp(exponent));
 }
+//---------------------------------------------------------------------------------------
+
+
