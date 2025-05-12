@@ -17,7 +17,7 @@ This project is a continuation of my first shader program that can be found [her
 
 To start with i removed the previous shader featrues such as fog and spotlight, i then implemented new models such as a table for the can to be placed on and a ruined wall.
 <div align="center">
-  <img src="imgs/Before.png" alt="img" width="600"/>
+  <img src="Documentation/imgs/Before.png" alt="img" width="600"/>
 </div>
 After this was done i had a scene that i was ready to start implementing new shader features onto.
 
@@ -71,7 +71,7 @@ void render()
 
 ```
 <div align="center">
-  <img src="imgs/Particle.png" alt="img" width="600"/>
+  <img src="Documentation/imgs/Particle.png" alt="img" width="600"/>
 </div>
 
 
@@ -86,9 +86,12 @@ I created two new shaders for this called Blur.vert and Blur.frag, these shaders
 
 As you can tell from the previous images, a blur effect has now been applied to the scene. 
 <div align="center">
-  <img src="imgs/Guassblr.png" alt="img" width="600"/>
+  <img src="Documentation/imgs/Guassblr.png" alt="img" width="600"/>
 </div>
 
+
+## Third Shader - Bloom effect
+My vision for the bloom effect was to have the light blooming off the can to give off a radiation
 
 # Resources Used
 ### OpenGL handbook
