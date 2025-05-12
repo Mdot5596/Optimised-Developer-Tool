@@ -36,6 +36,7 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     Canmesh = ObjMesh::load("media/soda can.obj", true);
     Wallmesh = ObjMesh::load("media/wall.obj", true);
     Tablemesh = ObjMesh::load("media/table.obj", true);
+    Ruinmesh = ObjMesh::load("media/HouseRender.obj", true);
 }
 
 
@@ -93,6 +94,14 @@ void SceneBasic_Uniform::initScene()
     glActiveTexture(GL_TEXTURE4);
     GLuint tableTex = Texture::loadTexture("media/texture/Table.png");
     glBindTexture(GL_TEXTURE_2D, tableTex);
+    
+    
+    //Load Ruin Textures
+    /*
+    glActiveTexture(GL_TEXTURE5);
+    GLuint ruinTex = Texture::loadTexture("media/texture/House38UVTexture.png");
+    glBindTexture(GL_TEXTURE_2D, ruinTex);
+    */
 
     //Mix Texture 
     glActiveTexture(GL_TEXTURE2);
@@ -131,7 +140,7 @@ void SceneBasic_Uniform::initScene()
 
     setupFBO();
 
-    //Gassian Blur
+    //---------------Gassian Blur-----------------
 
     GLfloat verts[] =
     {
@@ -183,7 +192,7 @@ void SceneBasic_Uniform::initScene()
         gassblr.setUniform(uniName.str().c_str(), val);
     }
 }
-
+//---------------------------------------------------------
 
 
 void SceneBasic_Uniform::compile()
@@ -218,7 +227,7 @@ void SceneBasic_Uniform::compile()
 
 void SceneBasic_Uniform::update(float t)
 {
-    deltaT = t - tPrev;  // Make sure this is set before rendering
+    deltaT = t - tPrev;  
 
 
     time = t;
@@ -231,14 +240,13 @@ void SceneBasic_Uniform::update(float t)
     if (angle > glm::two_pi<float>()) {
         angle -= glm::two_pi<float>();
     }
-    // Update the time variable
+   
     time += deltaT;
 
 
     handleKeyboardInput(deltaT);
     handleMouseInput();
 
-    // Recalculate view matrix after inputs
     view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
 
 }
@@ -324,6 +332,20 @@ void SceneBasic_Uniform::pass1()
     prog.setUniform("texScale", 1.0f);
     prog.setUniform("UseSecondTexture", false);
     Tablemesh->render();
+
+    // Render Ruin
+    /*
+    glActiveTexture(GL_TEXTURE5);
+    glBindTexture(GL_TEXTURE_2D,ruinTex);
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.0f, 20.0f, -40.0f));
+    model = glm::scale(model, glm::vec3(13.5f));
+    setMatrices(prog);
+    prog.setUniform("texScale", 1.0f);
+    prog.setUniform("UseSecondTexture", false);
+    Ruinmesh->render();
+    */
+
 
     // Bind moss mix texture for later usage
     glActiveTexture(GL_TEXTURE2);
@@ -605,6 +627,7 @@ void SceneBasic_Uniform::setupFBO()
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderTex, 0);
 
+
     GLuint depthBuf;
     glGenRenderbuffers(1, &depthBuf);
     glBindRenderbuffer(GL_RENDERBUFFER, depthBuf);
@@ -650,5 +673,4 @@ float SceneBasic_Uniform::gauss(float x, float sigma2)
     return (float)(coeff * exp(exponent));
 }
 //---------------------------------------------------------------------------------------
-
 

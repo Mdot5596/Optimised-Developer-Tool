@@ -23,21 +23,21 @@ private:
     std::unique_ptr<ObjMesh> Canmesh;
     std::unique_ptr<ObjMesh> Wallmesh;
     std::unique_ptr<ObjMesh> Tablemesh;
-
+    std::unique_ptr<ObjMesh> Ruinmesh;
 
     GLuint sodaCanTex;
     GLuint cubeTex;
     GLuint wallTex;
     GLuint tableTex;
-
+    GLuint ruinTex;
 
     SkyBox sky;
     GLuint planeTex;
     GLuint mixTex;
     float tPrev;
     float angle;
-    GLSLProgram prog, skyProg, particlefnt, gassblr;
-    GLuint fsQuad, renderTex, intermediateTex, renderFBO, intermediateFBO;
+    GLSLProgram prog, skyProg, particlefnt, gassblr, brightpassProg;
+    GLuint fsQuad, renderTex, intermediateTex, renderFBO, intermediateFBO, bloomExtract;
     void setMatrices(GLSLProgram& p);
     void compile();
 
@@ -70,8 +70,10 @@ private:
     void pass1();
     void pass2();
     void pass3();
+    void pass4();
     float gauss(float, float);
 
+    //
 
 
 
