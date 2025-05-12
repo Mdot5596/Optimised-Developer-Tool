@@ -79,11 +79,59 @@ void render()
 ## Second Shader - Gaussian Blur
 The idea behind using Gaussian Blur was inspired by the aesthetic of the fallout series. If you’re a fan you know the setting involves widespread nuclear devastation, with atomic bombs dropping everywhere. I wanted the blur effect to represent the impact of radiation on the user – specifically what it would be like to see after the radiation has affected your eyesight.
 
-I created two new shaders for this called Blur.vert and Blur.frag, these shaders 
+I created two new shaders for this effect: Blur.vert and Blur.frag.
 
+Blur.vert transforms the vertex positions and normals for use in lighting calculations. It outputs the transformed data to be used in the fragment shader.
+```cpp
+void main() 
+{
+   Normal = normalize(NormalMatrix*VertexNormal);
+   Position =(ModelViewMatrix*vec4(VertexPosition,1.0)).xyz;
 
+   gl_Position = MVP*vec4(VertexPosition,1.0);
 
+}
+```
+Blur.frag performs the rendering in multiple passes:
+- The scene is first shaded using Blinn-Phong lighting (Pass 1)
+- The result is stored in a framebuffer and blurred vertically (Pass 2)
+- The vertically blurred image is then blurred horizontally (Pass 3), completing a separable Gaussian blur
+```cpp
+vec4 pass1()
+{
+ return vec4(blinnPhong(Position, normalize(Normal)), 1.0);
+}
 
+vec4 pass2()
+{
+ivec2 pix=ivec2(gl_FragCoord.xy);
+vec4 sum=texelFetch(Texture3, pix, 0)*Weight[0];
+sum+=texelFetchOffset(Texture3, pix,0, ivec2(0,1))*Weight[1];
+sum+=texelFetchOffset(Texture3, pix,0, ivec2(0,-1))*Weight[1];
+sum+=texelFetchOffset(Texture3, pix,0, ivec2(0,2))*Weight[2];
+sum+=texelFetchOffset(Texture3, pix,0, ivec2(0,-2))*Weight[2];
+sum+=texelFetchOffset(Texture3, pix,0, ivec2(0,3))*Weight[3];
+sum+=texelFetchOffset(Texture3, pix,0, ivec2(0,-3))*Weight[3];
+sum+=texelFetchOffset(Texture3, pix,0, ivec2(0,4))*Weight[4];
+sum+=texelFetchOffset(Texture3, pix,0, ivec2(0,-4))*Weight[4];
+return sum;
+}
+
+vec4 pass3()
+{
+ivec2 pix=ivec2(gl_FragCoord.xy);
+vec4 sum=texelFetch(Texture3, pix, 0)*Weight[0];
+sum+=texelFetchOffset(Texture3, pix,0, ivec2(1,0))*Weight[1];
+sum+=texelFetchOffset(Texture3, pix,0, ivec2(-1,0))*Weight[1];
+sum+=texelFetchOffset(Texture3, pix,0, ivec2(2,0))*Weight[2];
+sum+=texelFetchOffset(Texture3, pix,0, ivec2(-2,0))*Weight[2];
+sum+=texelFetchOffset(Texture3, pix,0, ivec2(3,0))*Weight[3];
+sum+=texelFetchOffset(Texture3, pix,0, ivec2(-3,0))*Weight[3];
+sum+=texelFetchOffset(Texture3, pix,0, ivec2(4,0))*Weight[4];
+sum+=texelFetchOffset(Texture3, pix,0, ivec2(-4,0))*Weight[4];
+return sum;
+}
+```
 As you can tell from the previous images, a blur effect has now been applied to the scene. 
 <div align="center">
   <img src="Documentation/imgs/Guassblr.png" alt="img" width="600"/>
@@ -91,7 +139,10 @@ As you can tell from the previous images, a blur effect has now been applied to 
 
 
 ## Third Shader - Bloom effect
-My vision for the bloom effect was to have the light blooming off the can to give off a radiation
+I had a vision for the third shader to be a bloom effect, this bloom effect would help shine the light from the green particles and reflect on the Nuka cola can, emitting a green radioactive like glow. Unfortunately, i ran out of time to get this shader fully implemented, but you can view the two vertex and fragment shaders where i have made a start at implementing this.
+- [Bloom.Frag](VS/shader/bloom.frag)
+- [Bloom.Vertex](VS/shader/bloom.vert)
+
 
 # Resources Used
 ### OpenGL handbook
