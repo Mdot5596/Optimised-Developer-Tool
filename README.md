@@ -1,7 +1,7 @@
 # Optimised-Developer-Tool
 A project that showcases 3 shading techniques combined into one efficient render pipeline
 
-## Video:
+## Video: (https://www.youtube.com/watch?v=wCH8nPTUi_Y)
 
 ## How to interact with the exe:
 Use W,A,S,D to move around the scene
